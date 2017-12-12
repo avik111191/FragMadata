@@ -38,7 +38,7 @@ public class Sort {
 	    }
 	
 	 public static  class sortRedeuce
-	    extends Reducer<LongWritable,LongWritable,LongWritable,LongWritable>
+	    extends Reducer<LongWritable,LongWritable,Text,Text>
 	    {
 		  int c=0;
 		    private Logger logger = Logger.getLogger(sortRedeuce.class);
@@ -52,7 +52,7 @@ public class Sort {
 	        	logger.info(key.toString()+"--"+values.toString());
 	        	if(c < 10)
 	            while(valuesIt.hasNext()){
-	            	context.write(valuesIt.next(),key);
+	            	context.write(null,new Text(valuesIt.next().toString()+","+key.toString()));
 	            	c++;
 	            			if(c > 10) {
 	            						break;
@@ -73,20 +73,20 @@ public class Sort {
 
 	public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
-        Job job = new Job(conf, "sort");
-		job.setNumReduceTasks(1);
-        job.setJarByClass(Sort.class);
+        Job job1 = new Job(conf, "sort");
+		job1.setNumReduceTasks(1);
+        job1.setJarByClass(Sort.class);
         
-        job.setMapperClass(sortmap.class);
-        job.setOutputKeyClass(LongWritable.class);
-        job.setOutputValueClass(LongWritable.class);
-        job.setSortComparatorClass(LongWritable.DecreasingComparator.class);
+        job1.setMapperClass(sortmap.class);
+        job1.setOutputKeyClass(LongWritable.class);
+        job1.setOutputValueClass(LongWritable.class);
+        job1.setSortComparatorClass(LongWritable.DecreasingComparator.class);
 
-        job.setReducerClass(sortRedeuce.class);
+        job1.setReducerClass(sortRedeuce.class);
 
-        FileInputFormat.addInputPath(job, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job, new Path(args[2]));
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        FileInputFormat.addInputPath(job1, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job1, new Path(args[2]));
+        System.exit(job1.waitForCompletion(true) ? 0 : 1);
 
 
 	}
